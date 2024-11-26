@@ -15,6 +15,29 @@ CORS(app)
 # create the jackson family object
 jackson_family = FamilyStructure("Jackson")
 
+John = {
+    "first_name": "John",
+    "age": 33,
+    "lucky_numbers": [7, 13, 22]
+}
+
+Jane = {
+    "first_name": "Jane",
+    "age": 35,
+    "lucky_numbers": [10, 14, 3]
+}
+
+Jimmy = {
+    "first_name": "Jimmy",
+    "age": 5,
+    "lucky_numbers": [1]
+}
+
+# Function Call To Add Hard-Coded Family Members
+jackson_family.add_member(John)
+jackson_family.add_member(Jane)
+jackson_family.add_member(Jimmy)
+
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -25,19 +48,57 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+# GET ALL MEMBERS
 @app.route('/members', methods=['GET'])
-def handle_hello():
-
-    # this is how you can use the Family datastructure by calling its methods
+def get_members():
     members = jackson_family.get_all_members()
-    response_body = {
-        "hello": "world",
-        "family": members
-    }
+    
+    return jsonify(members), 200
 
 
-    return jsonify(response_body), 200
+# GET - single member
+@app.route('/member/<int:id>', methods=['GET'])
+def get_single_member(id):
+    # call the get_member() method
+    member = jackson_family.get_member(id)
+    
+    # check to see if a member was found or None
+    if member == None:
+        return {}  # jsonify(f'Member {id} not found!'), 404
+    
+    return member, 200
 
+# ADD - single member
+@app.route('/member', methods=['POST'])
+def add_single_member():
+    member = request.json
+    print(f'{member} added!')
+    jackson_family.add_member(member)
+    if member != None:
+        return "Sucessfully added", 200
+
+# DELETE - single member
+@app.route('/member/<int:id>', methods=['DELETE'])
+def delete_single_member(id):
+    # retrieve the member using the get_member(id) method in family structure
+    member = jackson_family.get_member(id)
+    # check to see if a member was found or None
+    if member != None:
+        # use the delete_member(id) method in family structure 
+        jackson_family.delete_member(id)
+        # return a jsonified message stating that the member was successfully removed (200)
+        return jsonify({
+            "message": "Successfully deleted",
+            "done": True
+        }), 200
+    
+    else:
+       return jsonify({
+            "message": "Member not found",
+            "done": False
+        }), 404
+    
+    
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))

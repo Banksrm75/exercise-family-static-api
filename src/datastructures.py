@@ -19,18 +19,33 @@ class FamilyStructure:
     def _generateId(self):
         return randint(0, 99999999)
 
-    def add_member(self, member):
-        # fill this method and update the return
-        pass
 
-    def delete_member(self, id):
-        # fill this method and update the return
-        pass
-
-    def get_member(self, id):
-        # fill this method and update the return
-        pass
-
-    # this method is done, it returns a list with all the family members
+    # DISPLAY ALL MEMBERS
     def get_all_members(self):
         return self._members
+
+
+    # DISPLAY - Single Member
+    def get_member(self, id):
+        # loop through each dict in self._members and find a particular Jackson by id number (for...in loop)
+        for member in self._members:
+            # if the id is found, return the member
+            if member["id"] == id:
+                print("Member found!")
+                print(member)
+                return member
+
+    # ADD - Single Member
+    def add_member(self, member):
+        member["id"] = self._generateId()
+        member["name"] = (member["first_name"]) + " " + (self.last_name)
+        self._members.append(member)
+
+    # DELETE - Single Member
+    def delete_member(self, id):
+        # loop through each dict in self._members and find a particular Jackson by id number (for...in loop)
+        for member in self._members:
+            # if the id is found, delete the member
+            if member["id"] == id:
+                del self._members["id"]
+            return None
